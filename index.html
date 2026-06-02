@@ -3,187 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucifer Gift Hub</title>
+    <title>Lucifer Gift Store</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #0b0816;
-            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0f19;
+            color: #ffffff;
             margin: 0;
-            padding: 15px;
-        }
-        .app-container {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
             padding: 20px;
-            backdrop-filter: blur(20px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
-        h2 { text-align: center; color: #a12cff; margin-bottom: 20px; }
-        
-        /* USER SEARCH BOX */
-        .search-box { display: flex; gap: 8px; margin-bottom: 15px; }
-        input, textarea {
-            flex: 1; background: #130f26; border: 1px solid #3d2b63;
-            border-radius: 12px; padding: 12px; color: white; font-size: 15px;
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background: #121826;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            text-align: center;
         }
-        input:focus, textarea:focus { border-color: #a12cff; outline: none; }
-        button.btn-search {
-            background: #a12cff; border: none; border-radius: 12px;
-            padding: 0 15px; color: white; font-weight: bold; cursor: pointer;
+        h1 {
+            color: #a855f7;
+            font-size: 24px;
+            margin-bottom: 20px;
         }
-
-        /* USER PROFILE CARD */
-        .profile-card {
-            display: none; align-items: center; gap: 15px;
-            background: rgba(161, 44, 255, 0.1); padding: 12px;
-            border-radius: 16px; border: 1px dashed #a12cff; margin-bottom: 20px;
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
         }
-        .profile-card img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2px solid #a12cff; }
-        .profile-info .name { font-weight: bold; font-size: 16px; }
-        .profile-info .username { color: #00e5ff; font-size: 13px; }
-
-        /* GIFTS GRID */
-        .gifts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
-        .gift-card {
-            background: #130f26; border: 2px solid transparent;
-            border-radius: 16px; padding: 12px 5px; text-align: center; cursor: pointer;
+        input {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #374151;
+            background: #1f293d;
+            color: white;
+            font-size: 16px;
+            outline: none;
         }
-        .gift-card.selected {
-            background: rgba(161, 44, 255, 0.15); border-color: #a12cff;
-            box-shadow: 0 0 10px rgba(161, 44, 255, 0.3);
+        input:focus {
+            border-color: #a855f7;
         }
-        .gift-avatar { font-size: 32px; }
-        .gift-price { color: #00e5ff; font-size: 12px; margin-top: 5px; }
-
-        /* ACTION BUTTON */
-        .btn-pay {
-            background: linear-gradient(90deg, #8a2be2, #a12cff);
-            color: white; border: none; padding: 15px; font-size: 16px;
-            font-weight: bold; border-radius: 14px; width: 100%; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(161, 44, 255, 0.3);
+        button {
+            padding: 12px 18px;
+            border: none;
+            background: #a855f7;
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
         }
+        button:hover {
+            background: #9333ea;
+        }
+        .user-card {
+            background: #1f293d;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 15px;
+            display: none;
+            text-align: left;
+        }
+        .gift-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .gift-item {
+            background: #1f293d;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.3s;
+        }
+        .gift-item:hover, .gift-item.active {
+            border-color: #a855f7;
+            background: #2d3748;
+        }
+        .gift-icon { font-size: 24px; }
+        .gift-stars { color: #facc15; font-size: 12px; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="app-container">
-    <h2>Lucifer Gift Store</h2>
-
+<div class="container">
+    <h1>Lucifer Gift Store</h1>
+    
     <div class="search-box">
-        <input type="text" id="search-input" placeholder="@username yoki ID kiriting">
-        <button class="btn-search" onclick="searchUser()">🔍</button>
+        <input type="text" id="usernameInput" placeholder="@username yoki ID yozing">
+        <button onclick="searchUser()">🔍</button>
     </div>
 
-    <div class="profile-card" id="profile-card">
-        <img id="user-photo" src="" alt="avatar">
-        <div class="profile-info">
-            <div class="name" id="user-name">-</div>
-            <div class="username" id="user-username">-</div>
-        </div>
+    <div id="userCard" class="user-card">
+        <p><strong>Foydalanuvchi:</strong> <span id="resName">...</span></p>
+        <p><strong>ID:</strong> <span id="resId">...</span></p>
     </div>
 
-    <div class="gifts-grid">
-        <div class="gift-card selected" onclick="selectGift(this, '5170145012310081615', 15)">
-            <div class="gift-avatar">🎈</div>
-            <div class="gift-price">15 ⭐️</div>
+    <div class="gift-grid">
+        <div class="gift-item" onclick="selectGift(this, 15)">
+            <div class="gift-icon">🎈</div>
+            <div class="gift-stars">15 ⭐️</div>
         </div>
-        <div class="gift-card" onclick="selectGift(this, '5170145012310081616', 50)">
-            <div class="gift-avatar">🔥</div>
-            <div class="gift-price">50 ⭐️</div>
+        <div class="gift-item" onclick="selectGift(this, 50)">
+            <div class="gift-icon">🔥</div>
+            <div class="gift-stars">50 ⭐️</div>
         </div>
-        <div class="gift-card" onclick="selectGift(this, '5170145012310081617', 100)">
-            <div class="gift-avatar">👑</div>
-            <div class="gift-price">100 ⭐️</div>
+        <div class="gift-item" onclick="selectGift(this, 100)">
+            <div class="gift-icon">👑</div>
+            <div class="gift-stars">100 ⭐️</div>
         </div>
     </div>
-
-    <div style="margin-bottom: 20px;">
-        <textarea id="comment-input" rows="2" placeholder="Tabrik so'zi yozing..."></textarea>
-    </div>
-
-    <button class="btn-pay" onclick="payAndSend()">💳 Sotib olish va Yuborish</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    tg.expand(); // WebApp-ni to'liq ekranda ochish
 
-    // Bot serveringizning IP manzili yoki domeni (FastAPI ishlayotgan joy)
-    const SERVER_URL = "http://10.120.68.162:8000";
+    // Beeline'ning ikkala ehtimoliy IP manzillari ro'yxati
+    const BACKEND_IPS = [
+        "http://10.120.68.162:8000",
+        "http://100.121.127.197:8000"
+    ];
 
+    let foundUser = null;
+    let selectedStars = null;
 
-    let targetUserId = null;
-    let selectedGiftId = "5170145012310081615";
-    let selectedPrice = 15;
+    // Serverga so'rov yuborish funksiyasi (Ikkala IP-ni ham sinab ko'radi)
+    async function sendRequest(endpoint, data) {
+        for (let ip of BACKEND_IPS) {
+            try {
+                const response = await fetch(`${ip}${endpoint}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                    timeout: 3000 // 3 soniya kutadi
+                });
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (err) {
+                console.log(`${ip} ulanib bo'lmadi, keyingisi sinab ko'rilmoqda...`);
+            }
+        }
+        throw new Error("Backend serverga ulanishning iloji bo'lmadi.");
+    }
 
-    // 1. Foydalanuvchini qidirish
+    // Foydalanuvchini qidirish
     async function searchUser() {
-        const query = document.getElementById("search-input").value.trim();
-        if(!query) return;
+        const query = document.getElementById('usernameInput').value.trim();
+        if (!query) {
+            alert("Iltimos, username yoki ID kiriting!");
+            return;
+        }
 
-        const response = await fetch(`${SERVER_URL}/api/search_user`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({ query: query })
-        });
-        const res = await response.json();
-
-        if(res.success) {
-            targetUserId = res.id;
-            document.getElementById("user-photo").src = res.photo;
-            document.getElementById("user-name").innerText = res.name;
-            document.getElementById("user-username").innerText = res.username || "ID: " + res.id;
-            document.getElementById("profile-card").style.display = "flex";
-        } else {
-            alert(res.error);
+        try {
+            const data = await sendRequest('/search', { query: query });
+            if (data && data.status === 'success') {
+                foundUser = data.user;
+                document.getElementById('resName').innerText = foundUser.first_name || "Noma'lum";
+                document.getElementById('resId').innerText = foundUser.id;
+                document.getElementById('userCard').style.display = 'block';
+            } else {
+                alert("Foydalanuvchi topilmadi!");
+            }
+        } catch (error) {
+            alert("Xatolik: Server javob bermadi. Termux yoqiqligini tekshiring!");
         }
     }
 
-    // 2. Sovg'ani tanlash
-    function selectGift(element, giftId, price) {
-        document.querySelectorAll('.gift-card').forEach(c => c.classList.remove('selected'));
-        element.classList.add('selected');
-        selectedGiftId = giftId;
-        selectedPrice = price;
-    }
-
-    // 3. To'lov qilish va Yuborish
-    async function payAndSend() {
-        if(!targetUserId) {
+    // Sovg'ani tanlash
+    function selectGift(element, stars) {
+        if (!foundUser) {
             alert("Iltimos, avval foydalanuvchini qidirib toping!");
             return;
         }
-        const comment = document.getElementById("comment-input").value.trim();
-
-        // Serverdan to'lov havolasini olamiz
-        const response = await fetch(`${SERVER_URL}/api/create_invoice`, {
-            method: "POST",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-                user_id: tg.initDataUnsafe.user.id,
-                target_id: targetUserId,
-                gift_id: selectedGiftId,
-                price: selectedPrice,
-                comment: comment
-            })
-        });
-        const res = await response.json();
-
-        if(res.success) {
-            // Telegram WebApp-ning o'zida rasmiy Stars to'lov oynasini ochamiz!
-            tg.openInvoice(res.invoice_url, function(status) {
-                if(status === 'paid') {
-                    tg.close(); // To'lansa yopiladi, bot o'zi xabar beradi
-                } else if(status === 'failed') {
-                    alert("To'lov amalga oshmadi.");
-                }
-            });
-        } else {
-            alert("Xatolik: " + res.error);
-        }
+        
+        // Aktiv klassni boshqarish
+        document.querySelectorAll('.gift-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+        
+        selectedStars = stars;
+        
+        // Telegram botga ma'lumotni qaytarish (In-app to'lov oynasini ochish uchun)
+        const resultData = {
+            user_id: foundUser.id,
+            stars: selectedStars
+        };
+        
+        // Ma'lumotni botga jo'natib, WebApp-ni yopish
+        tg.sendData(JSON.stringify(resultData));
     }
 </script>
+
 </body>
 </html>
