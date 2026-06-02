@@ -29,66 +29,75 @@
         h1 {
             color: #a855f7;
             font-size: 24px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
         .search-box {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #9ca3af;
+            font-size: 14px;
         }
         input {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
             border: 1px solid #374151;
             background: #1f293d;
             color: white;
             font-size: 16px;
             outline: none;
+            box-sizing: border-box;
         }
         input:focus {
             border-color: #a855f7;
         }
-        button {
-            padding: 12px 18px;
-            border: none;
-            background: #a855f7;
-            color: white;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background: #9333ea;
-        }
-        .user-card {
-            background: #1f293d;
-            padding: 15px;
-            border-radius: 12px;
-            margin-top: 15px;
-            display: none;
+        .gift-section-title {
             text-align: left;
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
         .gift-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-bottom: 20px;
         }
         .gift-item {
             background: #1f293d;
-            padding: 12px;
-            border-radius: 12px;
+            padding: 15px 10px;
+            border-radius: 14px;
             cursor: pointer;
             border: 2px solid transparent;
-            transition: 0.3s;
+            transition: 0.2s;
         }
-        .gift-item:hover, .gift-item.active {
+        .gift-item:active {
+            transform: scale(0.95);
+        }
+        .gift-item.active {
             border-color: #a855f7;
             background: #2d3748;
         }
-        .gift-icon { font-size: 24px; }
-        .gift-stars { color: #facc15; font-size: 12px; margin-top: 5px; }
+        .gift-icon { font-size: 28px; }
+        .gift-stars { color: #facc15; font-size: 14px; margin-top: 5px; font-weight: bold; }
+        
+        .send-btn {
+            width: 100%;
+            padding: 14px;
+            background: #a855f7;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .send-btn:hover { background: #9333ea; }
     </style>
 </head>
 <body>
@@ -97,15 +106,11 @@
     <h1>Lucifer Gift Store</h1>
     
     <div class="search-box">
-        <input type="text" id="usernameInput" placeholder="@username yoki ID yozing">
-        <button onclick="searchUser()">🔍</button>
+        <label for="usernameInput">Kimga yuboriladi?</label>
+        <input type="text" id="usernameInput" placeholder="@username yoki ID raqami">
     </div>
 
-    <div id="userCard" class="user-card">
-        <p><strong>Foydalanuvchi:</strong> <span id="resName">...</span></p>
-        <p><strong>ID:</strong> <span id="resId">...</span></p>
-    </div>
-
+    <div class="gift-section-title">Sovg'ani tanlang:</div>
     <div class="gift-grid">
         <div class="gift-item" onclick="selectGift(this, 15)">
             <div class="gift-icon">🎈</div>
@@ -120,84 +125,42 @@
             <div class="gift-stars">100 ⭐️</div>
         </div>
     </div>
+
+    <button class="send-btn" onclick="sendToBot()">Yuborish 🚀</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand(); // WebApp-ni to'liq ekranda ochish
+    tg.expand(); // Oynani to'liq ochish
 
-    // Beeline'ning ikkala ehtimoliy IP manzillari ro'yxati
-    const BACKEND_IPS = [
-        "http://10.120.68.162:8000",
-        "http://100.121.127.197:8000"
-    ];
-
-    let foundUser = null;
     let selectedStars = null;
 
-    // Serverga so'rov yuborish funksiyasi (Ikkala IP-ni ham sinab ko'radi)
-    async function sendRequest(endpoint, data) {
-        for (let ip of BACKEND_IPS) {
-            try {
-                const response = await fetch(`${ip}${endpoint}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                    timeout: 3000 // 3 soniya kutadi
-                });
-                if (response.ok) {
-                    return await response.json();
-                }
-            } catch (err) {
-                console.log(`${ip} ulanib bo'lmadi, keyingisi sinab ko'rilmoqda...`);
-            }
-        }
-        throw new Error("Backend serverga ulanishning iloji bo'lmadi.");
-    }
-
-    // Foydalanuvchini qidirish
-    async function searchUser() {
-        const query = document.getElementById('usernameInput').value.trim();
-        if (!query) {
-            alert("Iltimos, username yoki ID kiriting!");
-            return;
-        }
-
-        try {
-            const data = await sendRequest('/search', { query: query });
-            if (data && data.status === 'success') {
-                foundUser = data.user;
-                document.getElementById('resName').innerText = foundUser.first_name || "Noma'lum";
-                document.getElementById('resId').innerText = foundUser.id;
-                document.getElementById('userCard').style.display = 'block';
-            } else {
-                alert("Foydalanuvchi topilmadi!");
-            }
-        } catch (error) {
-            alert("Xatolik: Server javob bermadi. Termux yoqiqligini tekshiring!");
-        }
-    }
-
-    // Sovg'ani tanlash
+    // Sovg'ani tanlash funksiyasi
     function selectGift(element, stars) {
-        if (!foundUser) {
-            alert("Iltimos, avval foydalanuvchini qidirib toping!");
-            return;
-        }
-        
-        // Aktiv klassni boshqarish
         document.querySelectorAll('.gift-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
-        
         selectedStars = stars;
+    }
+
+    // Ma'lumotni to'g'ridan-to'g'ri botga yuborish
+    function sendToBot() {
+        const userInput = document.getElementById('usernameInput').value.trim();
         
-        // Telegram botga ma'lumotni qaytarish (In-app to'lov oynasini ochish uchun)
+        if (!userInput) {
+            alert("Iltimos, kimga yuborishni kiriting (@username yoki ID)!");
+            return;
+        }
+        if (!selectedStars) {
+            alert("Iltimos, sovg'alardan birini tanlang!");
+            return;
+        }
+
+        // Hech qanday server qidiruvlarisiz ma'lumotni botga qaytaramiz
         const resultData = {
-            user_id: foundUser.id,
+            target: userInput,
             stars: selectedStars
         };
-        
-        // Ma'lumotni botga jo'natib, WebApp-ni yopish
+
         tg.sendData(JSON.stringify(resultData));
     }
 </script>
